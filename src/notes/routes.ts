@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NoteStore } from "./store.js";
+import type { Note } from "./types.js";
 import { validateCreateInput, validateUpdateInput } from "./validation.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
@@ -32,6 +33,24 @@ function noteIdFromPath(pathname: string): string | undefined {
   return match?.[1];
 }
 
+function parseSearchQuery(url: string | undefined): string | undefined {
+  const query = new URL(url ?? "", "http://localhost").searchParams.get("search");
+  if (query === null) {
+    return undefined;
+  }
+  const trimmed = query.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function filterNotesBySearch(notes: Note[], search: string): Note[] {
+  const needle = search.toLowerCase();
+  return notes.filter(
+    (note) =>
+      note.title.toLowerCase().includes(needle) ||
+      note.body.toLowerCase().includes(needle),
+  );
+}
+
 export async function handleNotesRoutes(
   req: IncomingMessage,
   res: ServerResponse,
@@ -51,7 +70,10 @@ export async function handleNotesRoutes(
   }
 
   if (pathname === "/notes" && method === "GET") {
-    sendJson(res, 200, store.getAll());
+    const all = store.getAll();
+    const search = parseSearchQuery(req.url);
+    const notes = search ? filterNotesBySearch(all, search) : all;
+    sendJson(res, 200, notes);
     return true;
   }
 
