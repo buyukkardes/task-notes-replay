@@ -51,6 +51,10 @@ function filterNotesBySearch(notes: Note[], search: string): Note[] {
   );
 }
 
+function sortNotesByCreatedAtDesc(notes: Note[]): Note[] {
+  return [...notes].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
 export async function handleNotesRoutes(
   req: IncomingMessage,
   res: ServerResponse,
@@ -72,7 +76,8 @@ export async function handleNotesRoutes(
   if (pathname === "/notes" && method === "GET") {
     const all = store.getAll();
     const search = parseSearchQuery(req.url);
-    const notes = search ? filterNotesBySearch(all, search) : all;
+    const filtered = search ? filterNotesBySearch(all, search) : all;
+    const notes = sortNotesByCreatedAtDesc(filtered);
     sendJson(res, 200, notes);
     return true;
   }

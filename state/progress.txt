@@ -90,3 +90,13 @@ Verified: bash scripts/verify.sh green.
 Human: bash scripts/auto-push.sh --branch feat/notes-search
 
 Next: Phase 3 — Sort by createdAt descending.
+
+## 2026-08-14 — Phase 3: Sort by createdAt descending
+
+Added sortNotesByCreatedAtDesc in src/notes/routes.ts — GET /notes (and ?search= results) return newest-first by createdAt.
+Two integration tests with vi.useFakeTimers: full list order and search-filtered order.
+Verified: bash scripts/verify.sh green.
+
+Human: bash scripts/auto-push.sh --branch feat/notes-sort
+
+Next: Phase 4 — Serve public/; list notes in browser.

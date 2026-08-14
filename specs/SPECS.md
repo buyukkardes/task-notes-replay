@@ -44,7 +44,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 - [x] Max field length 1000
 - [x] GET /notes/stats → `{ count }`
 - [x] GET /notes?search= filter
-- [ ] Sort by createdAt descending
+- [x] Sort by createdAt descending
 
 **Verification:** tests pass.
 
