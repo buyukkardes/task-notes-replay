@@ -57,3 +57,13 @@ Verified: `bash scripts/verify.sh` green (21 tests).
 Human: bash scripts/auto-push.sh --branch feat/notes-get-by-id
 
 Next: Phase 3 — Max field length 1000.
+
+## 2026-08-14 — Phase 3: Max field length 1000
+
+Added `MAX_FIELD_LENGTH` (1000) validation in `src/notes/validation.ts` — rejects over-limit `title`/`body` on POST and PUT with HTTP 400.
+Four integration tests for over-limit POST (title, body) and PUT (title, body).
+Verified: `bash scripts/verify.sh` green (25 tests).
+
+Human: bash scripts/auto-push.sh --branch feat/notes-max-field-length
+
+Next: Phase 3 — GET /notes/stats → `{ count }`.

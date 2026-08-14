@@ -148,6 +148,32 @@ describe("Notes API", () => {
     });
   });
 
+  it("POST /notes returns 400 when title exceeds 1000 characters", async () => {
+    const res = await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "a".repeat(1001), body: "Valid body" }),
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "title must be at most 1000 characters",
+    });
+  });
+
+  it("POST /notes returns 400 when body exceeds 1000 characters", async () => {
+    const res = await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Valid title", body: "b".repeat(1001) }),
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "body must be at most 1000 characters",
+    });
+  });
+
   it("POST /notes returns 400 for empty body field", async () => {
     const res = await fetch(`${baseUrl}/notes`, {
       method: "POST",
@@ -170,6 +196,46 @@ describe("Notes API", () => {
 
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ error: "Invalid JSON body" });
+  });
+
+  it("PUT /notes/:id returns 400 when title exceeds 1000 characters", async () => {
+    const createRes = await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Update me", body: "Body" }),
+    });
+    const created = await createRes.json();
+
+    const res = await fetch(`${baseUrl}/notes/${created.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "t".repeat(1001) }),
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "title must be at most 1000 characters",
+    });
+  });
+
+  it("PUT /notes/:id returns 400 when body exceeds 1000 characters", async () => {
+    const createRes = await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Update me", body: "Body" }),
+    });
+    const created = await createRes.json();
+
+    const res = await fetch(`${baseUrl}/notes/${created.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: "b".repeat(1001) }),
+    });
+
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "body must be at most 1000 characters",
+    });
   });
 
   it("PUT /notes/:id returns 400 when no fields provided", async () => {
