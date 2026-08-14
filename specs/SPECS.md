@@ -52,7 +52,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ## Phase 4 — Static UI
 
-- [ ] Serve `public/`; list notes in browser
+- [x] Serve `public/`; list notes in browser
 
 ---
 

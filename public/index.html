@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Notes</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Task Notes</h1>
+      <p class="lead">Notes from the API, newest first.</p>
+
+      <section aria-labelledby="notes-heading">
+        <h2 id="notes-heading">Notes</h2>
+        <p id="notes-error" class="notes-error" hidden role="alert"></p>
+        <p id="notes-status" class="notes-status">Loading notes…</p>
+        <ul id="notes-list" class="notes-list" hidden></ul>
+      </section>
+    </main>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

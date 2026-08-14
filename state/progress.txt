@@ -100,3 +100,14 @@ Verified: bash scripts/verify.sh green.
 Human: bash scripts/auto-push.sh --branch feat/notes-sort
 
 Next: Phase 4 — Serve public/; list notes in browser.
+
+## 2026-08-14 — Phase 4: Static UI — serve public/; list notes
+
+Added src/static.ts — serve public/ with path traversal protection and MIME types.
+Updated src/server.ts — API routes take precedence; static fallback for GET / and assets.
+Added public/index.html, app.js, styles.css — fetch GET /notes, render title/dates/body; empty and error states.
+Added tests/static.test.ts (/, /styles.css, /app.js, /notes stays JSON).
+Updated docs/architecture.md with public/ layout.
+Verified: bash scripts/verify.sh green (36 tests).
+
+Next: Phase 5 — Create, delete, edit, search, stats panel.
