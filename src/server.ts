@@ -1,8 +1,12 @@
 import http from "node:http";
 import { handleNotesRoutes } from "./notes/routes.js";
 import { NoteStore } from "./notes/store.js";
+import { defaultPublicDir, tryServeStatic } from "./static.js";
 
-export function createServer(store = new NoteStore()): http.Server {
+export function createServer(
+  store = new NoteStore(),
+  publicDir = defaultPublicDir(),
+): http.Server {
   return http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://${req.headers.host ?? "localhost"}`);
 
@@ -13,6 +17,10 @@ export function createServer(store = new NoteStore()): http.Server {
     }
 
     if (await handleNotesRoutes(req, res, url.pathname, store)) {
+      return;
+    }
+
+    if (await tryServeStatic(req, res, publicDir)) {
       return;
     }
 
