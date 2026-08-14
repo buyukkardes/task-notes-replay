@@ -54,4 +54,6 @@ Added `GET /notes/:id` handler in `src/notes/routes.ts` — returns 200 with not
 PUT/DELETE 404 behavior was already implemented; added integration tests for all three cases.
 Verified: `bash scripts/verify.sh` green (21 tests).
 
+Human: bash scripts/auto-push.sh --branch feat/notes-get-by-id
+
 Next: Phase 3 — Max field length 1000.
