@@ -1,5 +1,5 @@
 import type { Server } from "node:http";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { NoteStore } from "../src/notes/store.js";
 import { createServer } from "../src/server.js";
 
@@ -23,6 +23,10 @@ describe("Notes API", () => {
     await new Promise<void>((resolve, reject) => {
       server.close((err) => (err ? reject(err) : resolve()));
     });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("GET /notes/stats returns count 0 for an empty store", async () => {
@@ -109,6 +113,31 @@ describe("Notes API", () => {
     await expect(res.json()).resolves.toEqual([]);
   });
 
+  it("GET /notes?search= returns filtered notes sorted by createdAt descending", async () => {
+    vi.useFakeTimers();
+
+    vi.setSystemTime(new Date("2026-06-01T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "FindMe older", body: "pipeline e2e" }),
+    });
+
+    vi.setSystemTime(new Date("2026-06-02T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "FindMe newer", body: "pipeline e2e" }),
+    });
+
+    const res = await fetch(`${baseUrl}/notes?search=FindMe`);
+    expect(res.status).toBe(200);
+
+    const notes = (await res.json()) as Array<{ title: string }>;
+    const findMe = notes.filter((n) => n.title.startsWith("FindMe"));
+    expect(findMe.map((n) => n.title)).toEqual(["FindMe newer", "FindMe older"]);
+  });
+
   it("GET /notes lists notes", async () => {
     const createRes = await fetch(`${baseUrl}/notes`, {
       method: "POST",
@@ -121,6 +150,45 @@ describe("Notes API", () => {
     expect(res.status).toBe(200);
     const notes = await res.json();
     expect(notes).toEqual(expect.arrayContaining([created]));
+  });
+
+  it("GET /notes returns notes sorted by createdAt descending", async () => {
+    vi.useFakeTimers();
+
+    vi.setSystemTime(new Date("2026-01-01T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Oldest", body: "First created" }),
+    });
+
+    vi.setSystemTime(new Date("2026-01-02T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Middle", body: "Second created" }),
+    });
+
+    vi.setSystemTime(new Date("2026-01-03T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Newest", body: "Third created" }),
+    });
+
+    const res = await fetch(`${baseUrl}/notes`);
+    expect(res.status).toBe(200);
+
+    const notes = (await res.json()) as Array<{ title: string; createdAt: string }>;
+
+    for (let i = 1; i < notes.length; i++) {
+      expect(notes[i - 1]!.createdAt >= notes[i]!.createdAt).toBe(true);
+    }
+
+    const created = notes.filter((note) =>
+      ["Newest", "Middle", "Oldest"].includes(note.title),
+    );
+    expect(created.map((note) => note.title)).toEqual(["Newest", "Middle", "Oldest"]);
   });
 
   it("GET /notes/:id returns 200 and the created note body", async () => {
