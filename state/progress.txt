@@ -125,3 +125,15 @@ Verified: bash scripts/verify.sh green (36 tests).
 Human: bash scripts/auto-push.sh --branch feat/ui-features
 
 Next: Phase 6 — Pagination API and UI.
+
+## 2026-08-14 — Phase 6: Pagination API — limit/offset
+
+GET /notes supports `?limit=` and `?offset=` query params. Paginated requests return `{ items, total }`;
+requests without pagination params still return a plain array. Default limit 50 when only offset is given;
+max limit 100. Invalid params return 400. Filter/search/sort apply before pagination.
+Updated src/notes/routes.ts, tests/notes.test.ts, docs/architecture.md.
+Verified: bash scripts/verify.sh green (42 tests).
+
+Human: bash scripts/auto-push.sh --branch feat/notes-pagination
+
+Next: Phase 6 — UI prev/next, search + pagination.

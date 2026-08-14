@@ -11,7 +11,7 @@ src/
     types.ts      # Note model
     store.ts      # In-memory Map store
     validation.ts # Request body validation
-    routes.ts     # CRUD /notes + GET /notes/stats + ?search= filter + createdAt desc sort
+    routes.ts     # CRUD /notes + GET /notes/stats + ?search= + ?limit=&offset= pagination
 public/
   index.html      # Notes page — stats, create form, search, list
   app.js          # CRUD UI: POST/PUT/DELETE /notes, GET ?search=, GET /notes/stats
