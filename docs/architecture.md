@@ -13,8 +13,8 @@ src/
     validation.ts # Request body validation
     routes.ts     # CRUD /notes + GET /notes/stats + ?search= filter + createdAt desc sort
 public/
-  index.html      # Notes list page
-  app.js          # Fetch GET /notes, render list
+  index.html      # Notes page — stats, create form, search, list
+  app.js          # CRUD UI: POST/PUT/DELETE /notes, GET ?search=, GET /notes/stats
   styles.css
 tests/
   health.test.ts  # GET /health integration test

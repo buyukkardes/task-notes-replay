@@ -58,7 +58,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ## Phase 5 — UI features
 
-- [ ] Create, delete, edit, search, stats panel
+- [x] Create, delete, edit, search, stats panel
 
 ---
 

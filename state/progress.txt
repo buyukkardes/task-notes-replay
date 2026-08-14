@@ -113,3 +113,15 @@ Verified: bash scripts/verify.sh green (36 tests).
 Human: bash scripts/auto-push.sh --branch feat/static-ui
 
 Next: Phase 5 — Create, delete, edit, search, stats panel.
+
+## 2026-08-14 — Phase 5: UI features — create, delete, edit, search, stats panel
+
+Added stats section (GET /notes/stats), create form (POST /notes), search input with debounce (GET /notes?search=),
+inline edit (PUT /notes/:id), delete per row (DELETE /notes/:id).
+Updated public/index.html, app.js, styles.css; extended tests/static.test.ts for new UI elements.
+Updated docs/architecture.md.
+Verified: bash scripts/verify.sh green (36 tests).
+
+Human: bash scripts/auto-push.sh --branch feat/ui-features
+
+Next: Phase 6 — Pagination API and UI.
