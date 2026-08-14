@@ -70,6 +70,17 @@ export async function handleNotesRoutes(
     return false;
   }
 
+  if (method === "GET") {
+    const note = store.get(id);
+    if (!note) {
+      sendError(res, 404, "Note not found");
+      return true;
+    }
+
+    sendJson(res, 200, note);
+    return true;
+  }
+
   if (method === "PUT") {
     let body: unknown;
     try {

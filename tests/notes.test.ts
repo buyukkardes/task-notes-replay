@@ -58,6 +58,25 @@ describe("Notes API", () => {
     expect(notes).toEqual(expect.arrayContaining([created]));
   });
 
+  it("GET /notes/:id returns 200 and the created note body", async () => {
+    const createRes = await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Fetch me", body: "Full note body" }),
+    });
+    const created = await createRes.json();
+
+    const res = await fetch(`${baseUrl}/notes/${created.id}`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual(created);
+  });
+
+  it("GET /notes/:id returns 404 for a missing id", async () => {
+    const res = await fetch(`${baseUrl}/notes/missing-id`);
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "Note not found" });
+  });
+
   it("PUT /notes/:id updates a note", async () => {
     const createRes = await fetch(`${baseUrl}/notes`, {
       method: "POST",
@@ -82,6 +101,16 @@ describe("Notes API", () => {
     expect(updated.updatedAt).not.toBe(created.updatedAt);
   });
 
+  it("PUT /notes/:id returns 404 for a missing id", async () => {
+    const res = await fetch(`${baseUrl}/notes/missing-id`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Updated title" }),
+    });
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "Note not found" });
+  });
+
   it("DELETE /notes/:id removes a note", async () => {
     const createRes = await fetch(`${baseUrl}/notes`, {
       method: "POST",
@@ -98,6 +127,12 @@ describe("Notes API", () => {
     const listRes = await fetch(`${baseUrl}/notes`);
     const notes = await listRes.json();
     expect(notes.find((note: { id: string }) => note.id === created.id)).toBeUndefined();
+  });
+
+  it("DELETE /notes/:id returns 404 for a missing id", async () => {
+    const res = await fetch(`${baseUrl}/notes/missing-id`, { method: "DELETE" });
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "Note not found" });
   });
 
   it("POST /notes returns 400 for missing title", async () => {
