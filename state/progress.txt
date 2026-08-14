@@ -149,3 +149,13 @@ Verified: bash scripts/verify.sh green (42 tests).
 Human: bash scripts/auto-push.sh --branch feat/ui-pagination-controls
 
 Next: Phase 7 — Tags (optional).
+
+## 2026-08-14 — Phase 7: Tags — tags field, ?tag= filter, validation, tests
+
+Added tags: string[] to Note model; POST/PUT accept and validate tags (trim, dedupe case-insensitively, max 10 tags, max 50 chars each).
+GET /notes?tag= filters case-insensitively; works with search and pagination.
+Added src/notes/tags.ts, tests/tags.test.ts; updated store, validation, routes, store.test.ts, notes.test.ts.
+Updated docs/architecture.md; ticked specs/SPECS.md Phase 7.
+Verified: bash scripts/verify.sh green (48 tests).
+
+Next: all product spec units complete.

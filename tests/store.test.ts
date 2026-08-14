@@ -22,6 +22,7 @@ describe("NoteStore", () => {
       id: expect.any(String),
       title: "Hello",
       body: "World",
+      tags: [],
       createdAt: "2026-08-14T12:00:00.000Z",
       updatedAt: "2026-08-14T12:00:00.000Z",
     });
@@ -56,6 +57,7 @@ describe("NoteStore", () => {
       id: created.id,
       title: "New",
       body: "Body",
+      tags: [],
       createdAt: "2026-08-14T12:00:00.000Z",
       updatedAt: "2026-08-14T13:00:00.000Z",
     });

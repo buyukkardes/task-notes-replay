@@ -10,6 +10,7 @@ export class NoteStore {
       id: randomUUID(),
       title: input.title,
       body: input.body,
+      tags: input.tags ?? [],
       createdAt: now,
       updatedAt: now,
     };
@@ -35,6 +36,7 @@ export class NoteStore {
       ...existing,
       ...(input.title !== undefined ? { title: input.title } : {}),
       ...(input.body !== undefined ? { body: input.body } : {}),
+      ...(input.tags !== undefined ? { tags: input.tags } : {}),
       updatedAt: new Date().toISOString(),
     };
     this.notes.set(id, updated);

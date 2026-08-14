@@ -71,6 +71,6 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ## Phase 7 — Tags (optional)
 
-- [ ] `tags: string[]`, GET `?tag=`, validation, tests
+- [x] `tags: string[]`, GET `?tag=`, validation, tests
 
 **Verification:** `bash scripts/verify.sh` green; feature parity with harness-lab reference app.

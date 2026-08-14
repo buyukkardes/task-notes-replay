@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { NoteStore } from "./store.js";
 import type { Note } from "./types.js";
+import { filterNotesByTag, parseTagQuery } from "./tags.js";
 import { validateCreateInput, validateUpdateInput } from "./validation.js";
 
 const JSON_HEADERS = { "Content-Type": "application/json" };
@@ -119,7 +120,11 @@ export async function handleNotesRoutes(
   if (pathname === "/notes" && method === "GET") {
     const all = store.getAll();
     const search = parseSearchQuery(req.url);
-    const filtered = search ? filterNotesBySearch(all, search) : all;
+    const tag = parseTagQuery(req.url);
+    let filtered = search ? filterNotesBySearch(all, search) : all;
+    if (tag) {
+      filtered = filterNotesByTag(filtered, tag);
+    }
     const sorted = sortNotesByCreatedAtDesc(filtered);
     const pagination = parsePaginationQuery(req.url);
 

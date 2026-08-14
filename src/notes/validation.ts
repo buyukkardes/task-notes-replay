@@ -1,3 +1,4 @@
+import { normalizeTags } from "./tags.js";
 import type { CreateNoteInput, UpdateNoteInput } from "./types.js";
 
 export const MAX_FIELD_LENGTH = 1000;
@@ -35,7 +36,12 @@ export function validateCreateInput(
     return { ok: false, error: "body must be at most 1000 characters" };
   }
 
-  return { ok: true, value: { title, body: noteBody } };
+  const normalizedTags = normalizeTags(record.tags);
+  if ("error" in normalizedTags) {
+    return { ok: false, error: normalizedTags.error };
+  }
+
+  return { ok: true, value: { title, body: noteBody, tags: normalizedTags } };
 }
 
 export function validateUpdateInput(
@@ -48,9 +54,13 @@ export function validateUpdateInput(
   const record = body as Record<string, unknown>;
   const hasTitle = Object.prototype.hasOwnProperty.call(record, "title");
   const hasBody = Object.prototype.hasOwnProperty.call(record, "body");
+  const hasTags = Object.prototype.hasOwnProperty.call(record, "tags");
 
-  if (!hasTitle && !hasBody) {
-    return { ok: false, error: "At least one of title or body is required" };
+  if (!hasTitle && !hasBody && !hasTags) {
+    return {
+      ok: false,
+      error: "At least one of title, body, or tags is required",
+    };
   }
 
   const input: UpdateNoteInput = {};
@@ -75,6 +85,14 @@ export function validateUpdateInput(
       return { ok: false, error: "body must be at most 1000 characters" };
     }
     input.body = noteBody;
+  }
+
+  if (hasTags) {
+    const normalizedTags = normalizeTags(record.tags);
+    if ("error" in normalizedTags) {
+      return { ok: false, error: normalizedTags.error };
+    }
+    input.tags = normalizedTags;
   }
 
   return { ok: true, value: input };

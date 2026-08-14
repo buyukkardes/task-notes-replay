@@ -527,7 +527,7 @@ describe("Notes API", () => {
 
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({
-      error: "At least one of title or body is required",
+      error: "At least one of title, body, or tags is required",
     });
   });
 });
