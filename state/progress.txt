@@ -39,3 +39,11 @@ Verified: `bash scripts/verify.sh` green (17 tests).
 Next: Unit 2.3 — Completion (verify green, handoff).
 
 Human: bash scripts/auto-push.sh --branch feat/notes-store
+
+## 2026-08-14 — Unit 2.3 Completion
+
+Phase 2 Notes API complete. Re-ran `bash scripts/verify.sh` green (17 tests: smoke, store, health, notes CRUD).
+No code changes — checkpoint after merged PR #1 (feat/notes-store → main).
+Architecture paths already current from Unit 2.2.
+
+Next: Phase 3 — API quality (GET /notes/:id happy path; PUT/DELETE 404; max length; stats; search; sort).

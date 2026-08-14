@@ -34,7 +34,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ### Unit 2.3 — Completion
 
-- [ ] verify green, handoff
+- [x] verify green, handoff
 
 ---
 
