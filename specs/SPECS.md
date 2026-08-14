@@ -43,7 +43,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 - [x] GET /notes/:id happy path; PUT/DELETE 404
 - [x] Max field length 1000
 - [x] GET /notes/stats → `{ count }`
-- [ ] GET /notes?search= filter
+- [x] GET /notes?search= filter
 - [ ] Sort by createdAt descending
 
 **Verification:** tests pass.

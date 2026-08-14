@@ -76,6 +76,39 @@ describe("Notes API", () => {
     });
   });
 
+  it("GET /notes?search= filters by title or body (case-insensitive)", async () => {
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Apple pie", body: "Dessert recipe" }),
+    });
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Shopping", body: "Buy apple juice" }),
+    });
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Other", body: "Unrelated content" }),
+    });
+
+    const res = await fetch(`${baseUrl}/notes?search=apple`);
+    expect(res.status).toBe(200);
+
+    const notes = (await res.json()) as Array<{ title: string }>;
+    const titles = notes.map((n) => n.title);
+    expect(titles).toContain("Apple pie");
+    expect(titles).toContain("Shopping");
+    expect(titles).not.toContain("Other");
+  });
+
+  it("GET /notes?search= returns empty array when nothing matches", async () => {
+    const res = await fetch(`${baseUrl}/notes?search=zzznomatchzzzz`);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual([]);
+  });
+
   it("GET /notes lists notes", async () => {
     const createRes = await fetch(`${baseUrl}/notes`, {
       method: "POST",

@@ -78,3 +78,15 @@ Verified: `bash scripts/verify.sh` green.
 Human: bash scripts/auto-push.sh --branch feat/notes-stats
 
 Next: Phase 3 — GET /notes?search= filter.
+
+## 2026-08-14 — Phase 3: GET /notes?search= filter
+
+Added case-insensitive search on GET /notes via ?search= query param.
+Matches notes where title or body contains the search string (trimmed; empty returns all).
+Helpers parseSearchQuery and filterNotesBySearch in src/notes/routes.ts.
+Two integration tests: title/body match (case-insensitive), empty result set.
+Verified: bash scripts/verify.sh green.
+
+Human: bash scripts/auto-push.sh --branch feat/notes-search
+
+Next: Phase 3 — Sort by createdAt descending.
