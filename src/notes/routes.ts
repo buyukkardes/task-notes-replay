@@ -33,6 +33,49 @@ function noteIdFromPath(pathname: string): string | undefined {
   return match?.[1];
 }
 
+const DEFAULT_LIMIT = 50;
+const MAX_LIMIT = 100;
+
+type PaginationQuery =
+  | { mode: "all" }
+  | { mode: "paginated"; limit: number; offset: number };
+
+function parsePaginationQuery(
+  url: string | undefined,
+): PaginationQuery | { error: string } {
+  const params = new URL(url ?? "", "http://localhost").searchParams;
+  const hasLimit = params.has("limit");
+  const hasOffset = params.has("offset");
+
+  if (!hasLimit && !hasOffset) {
+    return { mode: "all" };
+  }
+
+  const limitRaw = hasLimit ? params.get("limit") : String(DEFAULT_LIMIT);
+  const offsetRaw = hasOffset ? params.get("offset") : "0";
+
+  if (limitRaw === null || offsetRaw === null) {
+    return { error: "limit and offset must be valid integers" };
+  }
+
+  const limit = Number(limitRaw);
+  const offset = Number(offsetRaw);
+
+  if (!Number.isInteger(limit) || limit < 1) {
+    return { error: "limit must be a positive integer" };
+  }
+
+  if (!Number.isInteger(offset) || offset < 0) {
+    return { error: "offset must be a non-negative integer" };
+  }
+
+  if (limit > MAX_LIMIT) {
+    return { error: `limit must be at most ${MAX_LIMIT}` };
+  }
+
+  return { mode: "paginated", limit, offset };
+}
+
 function parseSearchQuery(url: string | undefined): string | undefined {
   const query = new URL(url ?? "", "http://localhost").searchParams.get("search");
   if (query === null) {
@@ -77,8 +120,24 @@ export async function handleNotesRoutes(
     const all = store.getAll();
     const search = parseSearchQuery(req.url);
     const filtered = search ? filterNotesBySearch(all, search) : all;
-    const notes = sortNotesByCreatedAtDesc(filtered);
-    sendJson(res, 200, notes);
+    const sorted = sortNotesByCreatedAtDesc(filtered);
+    const pagination = parsePaginationQuery(req.url);
+
+    if ("error" in pagination) {
+      sendError(res, 400, pagination.error);
+      return true;
+    }
+
+    if (pagination.mode === "all") {
+      sendJson(res, 200, sorted);
+      return true;
+    }
+
+    const { limit, offset } = pagination;
+    sendJson(res, 200, {
+      items: sorted.slice(offset, offset + limit),
+      total: sorted.length,
+    });
     return true;
   }
 

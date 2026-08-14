@@ -373,6 +373,144 @@ describe("Notes API", () => {
     });
   });
 
+  it("GET /notes?limit=&offset= returns paginated items and total", async () => {
+    vi.useFakeTimers();
+
+    for (let i = 1; i <= 5; i++) {
+      vi.setSystemTime(new Date(`2026-02-0${i}T00:00:00.000Z`));
+      await fetch(`${baseUrl}/notes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: `PaginatePage ${i}`, body: `Body ${i}` }),
+      });
+    }
+
+    const firstPage = await fetch(
+      `${baseUrl}/notes?search=PaginatePage&limit=2&offset=0`,
+    );
+    expect(firstPage.status).toBe(200);
+    const page1 = (await firstPage.json()) as {
+      items: Array<{ title: string }>;
+      total: number;
+    };
+    expect(page1.items.map((note) => note.title)).toEqual([
+      "PaginatePage 5",
+      "PaginatePage 4",
+    ]);
+    expect(page1.total).toBe(5);
+
+    const secondPage = await fetch(
+      `${baseUrl}/notes?search=PaginatePage&limit=2&offset=2`,
+    );
+    expect(secondPage.status).toBe(200);
+    const page2 = (await secondPage.json()) as {
+      items: Array<{ title: string }>;
+      total: number;
+    };
+    expect(page2.items.map((note) => note.title)).toEqual([
+      "PaginatePage 3",
+      "PaginatePage 2",
+    ]);
+    expect(page2.total).toBe(5);
+  });
+
+  it("GET /notes?offset= beyond total returns empty items with total", async () => {
+    const beforeRes = await fetch(`${baseUrl}/notes/stats`);
+    const { count } = (await beforeRes.json()) as { count: number };
+
+    const res = await fetch(`${baseUrl}/notes?limit=10&offset=${count + 100}`);
+    expect(res.status).toBe(200);
+    await expect(res.json()).resolves.toEqual({
+      items: [],
+      total: count,
+    });
+  });
+
+  it("GET /notes?limit= without offset defaults offset to 0", async () => {
+    const res = await fetch(`${baseUrl}/notes?limit=1`);
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      items: unknown[];
+      total: number;
+    };
+    expect(body.items).toHaveLength(1);
+    expect(body.total).toBeGreaterThanOrEqual(1);
+  });
+
+  it("GET /notes?offset= without limit defaults limit to 50", async () => {
+    const res = await fetch(`${baseUrl}/notes?offset=0`);
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      items: unknown[];
+      total: number;
+    };
+    expect(Array.isArray(body.items)).toBe(true);
+    expect(typeof body.total).toBe("number");
+  });
+
+  it("GET /notes pagination returns 400 for invalid limit or offset", async () => {
+    const invalidLimit = await fetch(`${baseUrl}/notes?limit=0`);
+    expect(invalidLimit.status).toBe(400);
+    await expect(invalidLimit.json()).resolves.toEqual({
+      error: "limit must be a positive integer",
+    });
+
+    const limitTooLarge = await fetch(`${baseUrl}/notes?limit=101`);
+    expect(limitTooLarge.status).toBe(400);
+    await expect(limitTooLarge.json()).resolves.toEqual({
+      error: "limit must be at most 100",
+    });
+
+    const invalidOffset = await fetch(`${baseUrl}/notes?offset=-1`);
+    expect(invalidOffset.status).toBe(400);
+    await expect(invalidOffset.json()).resolves.toEqual({
+      error: "offset must be a non-negative integer",
+    });
+
+    const nonNumeric = await fetch(`${baseUrl}/notes?limit=abc`);
+    expect(nonNumeric.status).toBe(400);
+    await expect(nonNumeric.json()).resolves.toEqual({
+      error: "limit must be a positive integer",
+    });
+  });
+
+  it("GET /notes?search= with pagination filters then paginates", async () => {
+    vi.useFakeTimers();
+
+    vi.setSystemTime(new Date("2026-07-01T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Paginate alpha one", body: "x" }),
+    });
+
+    vi.setSystemTime(new Date("2026-07-02T00:00:00.000Z"));
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Paginate alpha two", body: "x" }),
+    });
+
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Paginate beta", body: "x" }),
+    });
+
+    const res = await fetch(`${baseUrl}/notes?search=alpha&limit=1&offset=0`);
+    expect(res.status).toBe(200);
+
+    const body = (await res.json()) as {
+      items: Array<{ title: string }>;
+      total: number;
+    };
+    expect(body.total).toBeGreaterThanOrEqual(2);
+    expect(body.items).toHaveLength(1);
+    expect(body.items[0]!.title).toBe("Paginate alpha two");
+  });
+
   it("PUT /notes/:id returns 400 when no fields provided", async () => {
     const createRes = await fetch(`${baseUrl}/notes`, {
       method: "POST",
