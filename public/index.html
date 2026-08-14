@@ -9,10 +9,42 @@
   <body>
     <main>
       <h1>Task Notes</h1>
-      <p class="lead">Notes from the API, newest first.</p>
+      <p class="lead">Create, search, edit, and delete notes.</p>
+
+      <section class="stats-section" aria-labelledby="stats-heading">
+        <h2 id="stats-heading">Stats</h2>
+        <p id="stats-status" class="stats-status">Loading stats…</p>
+        <p id="stats-count" class="stats-count" hidden></p>
+        <p id="stats-error" class="stats-error" hidden role="alert"></p>
+      </section>
+
+      <section class="create-section" aria-labelledby="create-heading">
+        <h2 id="create-heading">New note</h2>
+        <form id="create-form" class="create-form" novalidate>
+          <label class="field">
+            <span>Title</span>
+            <input id="note-title" name="title" type="text" maxlength="1000" required />
+          </label>
+          <label class="field">
+            <span>Body</span>
+            <textarea id="note-body" name="body" rows="4" maxlength="1000" required></textarea>
+          </label>
+          <p id="form-error" class="form-error" hidden role="alert"></p>
+          <button type="submit" class="btn btn-primary">Add note</button>
+        </form>
+      </section>
 
       <section aria-labelledby="notes-heading">
         <h2 id="notes-heading">Notes</h2>
+        <label class="search-field">
+          <span class="visually-hidden">Search notes</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Search by title or body…"
+            autocomplete="off"
+          />
+        </label>
         <p id="notes-error" class="notes-error" hidden role="alert"></p>
         <p id="notes-status" class="notes-status">Loading notes…</p>
         <ul id="notes-list" class="notes-list" hidden></ul>
