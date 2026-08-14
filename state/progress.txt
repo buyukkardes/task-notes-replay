@@ -26,3 +26,16 @@ Updated `docs/architecture.md` with notes module paths.
 Verified: `bash scripts/verify.sh` green.
 
 Next: Unit 2.2 — HTTP CRUD (POST/GET/PUT/DELETE `/notes`, validation → 400, API tests).
+
+## 2026-08-14 — Unit 2.2 HTTP CRUD
+
+Added `src/notes/validation.ts` — create/update body validation (non-empty title/body strings).
+Added `src/notes/routes.ts` — POST/GET `/notes`, PUT/DELETE `/notes/:id` wired to `NoteStore`.
+Updated `src/server.ts` to route notes requests via injectable store.
+Integration tests in `tests/notes.test.ts` (8 cases: CRUD happy paths, validation 400, invalid JSON).
+Updated `docs/architecture.md` with validation/routes paths.
+Verified: `bash scripts/verify.sh` green (17 tests).
+
+Next: Unit 2.3 — Completion (verify green, handoff).
+
+Human: bash scripts/auto-push.sh --branch feat/notes-store

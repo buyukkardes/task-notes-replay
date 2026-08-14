@@ -30,7 +30,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ### Unit 2.2 — HTTP CRUD
 
-- [ ] POST/GET/PUT/DELETE `/notes`, validation → 400, API tests
+- [x] POST/GET/PUT/DELETE `/notes`, validation → 400, API tests
 
 ### Unit 2.3 — Completion
 
