@@ -40,7 +40,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 
 ## Phase 3 — API quality
 
-- [ ] GET /notes/:id happy path; PUT/DELETE 404
+- [x] GET /notes/:id happy path; PUT/DELETE 404
 - [ ] Max field length 1000
 - [ ] GET /notes/stats → `{ count }`
 - [ ] GET /notes?search= filter

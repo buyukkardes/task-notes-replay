@@ -47,3 +47,11 @@ No code changes — checkpoint after merged PR #1 (feat/notes-store → main).
 Architecture paths already current from Unit 2.2.
 
 Next: Phase 3 — API quality (GET /notes/:id happy path; PUT/DELETE 404; max length; stats; search; sort).
+
+## 2026-08-14 — Phase 3: GET /notes/:id + PUT/DELETE 404
+
+Added `GET /notes/:id` handler in `src/notes/routes.ts` — returns 200 with note body or 404 `{ error: "Note not found" }`.
+PUT/DELETE 404 behavior was already implemented; added integration tests for all three cases.
+Verified: `bash scripts/verify.sh` green (21 tests).
+
+Next: Phase 3 — Max field length 1000.
