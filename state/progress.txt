@@ -110,4 +110,6 @@ Added tests/static.test.ts (/, /styles.css, /app.js, /notes stays JSON).
 Updated docs/architecture.md with public/ layout.
 Verified: bash scripts/verify.sh green (36 tests).
 
+Human: bash scripts/auto-push.sh --branch feat/static-ui
+
 Next: Phase 5 — Create, delete, edit, search, stats panel.
