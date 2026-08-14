@@ -65,7 +65,7 @@ TypeScript, Node `http`, Vitest, vanilla `public/` UI. **No harness meta** — u
 ## Phase 6 — Pagination
 
 - [x] API: `?limit=&offset=` → `{ items, total }`
-- [ ] UI: prev/next, search + pagination
+- [x] UI: prev/next, search + pagination
 
 ---
 

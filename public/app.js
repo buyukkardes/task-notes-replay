@@ -1,5 +1,6 @@
 const MAX_FIELD_LENGTH = 1000;
 const SEARCH_DEBOUNCE_MS = 300;
+const PAGE_SIZE = 10;
 
 const createForm = document.getElementById("create-form");
 const titleInput = document.getElementById("note-title");
@@ -12,9 +13,15 @@ const statsError = document.getElementById("stats-error");
 const notesList = document.getElementById("notes-list");
 const notesStatus = document.getElementById("notes-status");
 const notesError = document.getElementById("notes-error");
+const pagination = document.getElementById("pagination");
+const pagePrev = document.getElementById("page-prev");
+const pageNext = document.getElementById("page-next");
+const pageStatus = document.getElementById("page-status");
 
 let cachedNotes = [];
 let currentSearch = "";
+let currentOffset = 0;
+let totalNotes = 0;
 let editingNoteId = null;
 let searchDebounceTimer = null;
 
@@ -29,11 +36,20 @@ function formatDate(iso) {
   });
 }
 
+function clampOffset(offset, total) {
+  if (total <= 0) {
+    return 0;
+  }
+  const maxOffset = Math.max(0, Math.ceil(total / PAGE_SIZE) * PAGE_SIZE - PAGE_SIZE);
+  return Math.min(offset, maxOffset);
+}
+
 function showListError(message) {
   notesError.hidden = false;
   notesError.textContent = message;
   notesList.hidden = true;
   notesStatus.hidden = true;
+  pagination.hidden = true;
 }
 
 function clearFormError() {
@@ -168,6 +184,20 @@ function renderReadOnlyNote(note) {
   return item;
 }
 
+function updatePaginationControls() {
+  if (totalNotes <= PAGE_SIZE) {
+    pagination.hidden = true;
+    return;
+  }
+
+  pagination.hidden = false;
+  const start = totalNotes === 0 ? 0 : currentOffset + 1;
+  const end = Math.min(currentOffset + cachedNotes.length, totalNotes);
+  pageStatus.textContent = `Showing ${start}–${end} of ${totalNotes}`;
+  pagePrev.disabled = currentOffset <= 0;
+  pageNext.disabled = currentOffset + PAGE_SIZE >= totalNotes;
+}
+
 function renderNotes(notes) {
   notesError.hidden = true;
   notesStatus.hidden = true;
@@ -176,6 +206,7 @@ function renderNotes(notes) {
 
   if (notes.length === 0) {
     notesStatus.hidden = false;
+    pagination.hidden = true;
     notesStatus.textContent = currentSearch
       ? "No notes match your search."
       : "No notes yet. Add one with the form above.";
@@ -189,15 +220,20 @@ function renderNotes(notes) {
       notesList.append(renderReadOnlyNote(note));
     }
   }
+
+  updatePaginationControls();
 }
 
 function notesUrl() {
-  const trimmed = currentSearch.trim();
-  if (!trimmed) {
-    return "/notes";
-  }
   const params = new URLSearchParams();
-  params.set("search", trimmed);
+  params.set("limit", String(PAGE_SIZE));
+  params.set("offset", String(currentOffset));
+
+  const trimmed = currentSearch.trim();
+  if (trimmed) {
+    params.set("search", trimmed);
+  }
+
   return `/notes?${params.toString()}`;
 }
 
@@ -241,24 +277,34 @@ async function refreshNotesAndStats() {
   await Promise.all([loadNotes(), loadStats()]);
 }
 
-async function loadNotes() {
+async function loadNotes(retryOnEmptyPage = true) {
   notesError.hidden = true;
   notesStatus.hidden = false;
   notesStatus.textContent = "Loading notes…";
   notesList.hidden = true;
+  pagination.hidden = true;
 
   try {
     const response = await fetch(notesUrl());
     if (!response.ok) {
       throw new Error(`Request failed (${response.status})`);
     }
-    const notes = await response.json();
-    if (!Array.isArray(notes)) {
+    const body = await response.json();
+    if (!body || !Array.isArray(body.items) || typeof body.total !== "number") {
       throw new Error("Unexpected response from server");
     }
 
-    cachedNotes = notes;
-    renderNotes(notes);
+    totalNotes = body.total;
+    const clampedOffset = clampOffset(currentOffset, totalNotes);
+    if (clampedOffset !== currentOffset) {
+      currentOffset = clampedOffset;
+      if (retryOnEmptyPage) {
+        return loadNotes(false);
+      }
+    }
+
+    cachedNotes = body.items;
+    renderNotes(body.items);
   } catch (err) {
     const message =
       err instanceof TypeError
@@ -362,6 +408,7 @@ async function createNote(event) {
 
     titleInput.value = "";
     bodyInput.value = "";
+    currentOffset = 0;
     await refreshNotesAndStats();
   } catch (err) {
     const message =
@@ -398,6 +445,10 @@ async function deleteNote(id) {
       return;
     }
 
+    if (cachedNotes.length === 1 && currentOffset > 0) {
+      currentOffset = Math.max(0, currentOffset - PAGE_SIZE);
+    }
+
     await refreshNotesAndStats();
   } catch (err) {
     const message =
@@ -418,10 +469,23 @@ function handleSearchInput() {
   searchDebounceTimer = setTimeout(() => {
     searchDebounceTimer = null;
     editingNoteId = null;
+    currentOffset = 0;
     loadNotes();
   }, SEARCH_DEBOUNCE_MS);
 }
 
+function changePage(delta) {
+  const nextOffset = clampOffset(currentOffset + delta * PAGE_SIZE, totalNotes);
+  if (nextOffset === currentOffset) {
+    return;
+  }
+  currentOffset = nextOffset;
+  editingNoteId = null;
+  loadNotes();
+}
+
 createForm.addEventListener("submit", createNote);
 searchInput.addEventListener("input", handleSearchInput);
+pagePrev.addEventListener("click", () => changePage(-1));
+pageNext.addEventListener("click", () => changePage(1));
 refreshNotesAndStats();
