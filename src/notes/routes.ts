@@ -40,6 +40,16 @@ export async function handleNotesRoutes(
 ): Promise<boolean> {
   const method = req.method ?? "GET";
 
+  if (pathname === "/notes/stats") {
+    if (method === "GET") {
+      sendJson(res, 200, { count: store.getAll().length });
+      return true;
+    }
+
+    sendError(res, 404, "Not found");
+    return true;
+  }
+
   if (pathname === "/notes" && method === "GET") {
     sendJson(res, 200, store.getAll());
     return true;

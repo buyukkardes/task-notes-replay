@@ -67,3 +67,14 @@ Verified: `bash scripts/verify.sh` green (25 tests).
 Human: bash scripts/auto-push.sh --branch feat/notes-max-field-length
 
 Next: Phase 3 — GET /notes/stats → `{ count }`.
+
+## 2026-08-14 — Phase 3: GET /notes/stats
+
+Added `GET /notes/stats` in `src/notes/routes.ts` — returns `{ count }` from store size.
+Wrong methods on `/notes/stats` return 404 (avoids treating `stats` as a note id).
+Three integration tests: empty store, count after creates, POST 404.
+Verified: `bash scripts/verify.sh` green.
+
+Human: bash scripts/auto-push.sh --branch feat/notes-stats
+
+Next: Phase 3 — GET /notes?search= filter.

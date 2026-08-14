@@ -25,6 +25,38 @@ describe("Notes API", () => {
     });
   });
 
+  it("GET /notes/stats returns count 0 for an empty store", async () => {
+    const res = await fetch(`${baseUrl}/notes/stats`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: 0 });
+  });
+
+  it("GET /notes/stats returns the note count after creating notes", async () => {
+    const beforeRes = await fetch(`${baseUrl}/notes/stats`);
+    const { count: beforeCount } = (await beforeRes.json()) as { count: number };
+
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "First", body: "One" }),
+    });
+    await fetch(`${baseUrl}/notes`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "Second", body: "Two" }),
+    });
+
+    const res = await fetch(`${baseUrl}/notes/stats`);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ count: beforeCount + 2 });
+  });
+
+  it("POST /notes/stats returns 404", async () => {
+    const res = await fetch(`${baseUrl}/notes/stats`, { method: "POST" });
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ error: "Not found" });
+  });
+
   it("POST /notes creates a note", async () => {
     const res = await fetch(`${baseUrl}/notes`, {
       method: "POST",
@@ -84,6 +116,8 @@ describe("Notes API", () => {
       body: JSON.stringify({ title: "Old", body: "Body" }),
     });
     const created = await createRes.json();
+
+    await new Promise((resolve) => setTimeout(resolve, 5));
 
     const res = await fetch(`${baseUrl}/notes/${created.id}`, {
       method: "PUT",
