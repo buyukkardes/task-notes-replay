@@ -137,3 +137,15 @@ Verified: bash scripts/verify.sh green (42 tests).
 Human: bash scripts/auto-push.sh --branch feat/notes-pagination
 
 Next: Phase 6 — UI prev/next, search + pagination.
+
+## 2026-08-14 — Phase 6: UI pagination — prev/next, search + pagination
+
+UI now uses paginated GET /notes?limit=10&offset= with prev/next controls and "Showing X–Y of Z" status.
+Search preserves query and resets to page 1. Create resets to page 1; deleting last item on a page steps back.
+Updated public/index.html, app.js, styles.css; extended tests/static.test.ts for pagination elements.
+Updated docs/architecture.md.
+Verified: bash scripts/verify.sh green (42 tests).
+
+Human: bash scripts/auto-push.sh --branch feat/ui-pagination-controls
+
+Next: Phase 7 — Tags (optional).

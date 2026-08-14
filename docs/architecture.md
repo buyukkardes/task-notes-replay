@@ -14,7 +14,7 @@ src/
     routes.ts     # CRUD /notes + GET /notes/stats + ?search= + ?limit=&offset= pagination
 public/
   index.html      # Notes page — stats, create form, search, list
-  app.js          # CRUD UI: POST/PUT/DELETE /notes, GET ?search=, GET /notes/stats
+  app.js          # CRUD UI: POST/PUT/DELETE /notes, GET ?search= + ?limit=&offset= pagination, GET /notes/stats
   styles.css
 tests/
   health.test.ts  # GET /health integration test

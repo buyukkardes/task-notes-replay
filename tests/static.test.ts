@@ -35,6 +35,9 @@ describe("static files", () => {
     expect(body).toContain('id="create-form"');
     expect(body).toContain('id="search-input"');
     expect(body).toContain('id="stats-count"');
+    expect(body).toContain('id="pagination"');
+    expect(body).toContain('id="page-prev"');
+    expect(body).toContain('id="page-next"');
   });
 
   it("GET /styles.css returns CSS", async () => {
@@ -50,6 +53,8 @@ describe("static files", () => {
     const body = await response.text();
     expect(body).toContain("loadNotes");
     expect(body).toContain("loadStats");
+    expect(body).toContain("PAGE_SIZE");
+    expect(body).toContain("changePage");
   });
 
   it("does not serve API paths as static files", async () => {

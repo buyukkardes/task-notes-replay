@@ -164,6 +164,21 @@ body {
   gap: 1rem;
 }
 
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.page-status {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
 .note-item {
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
